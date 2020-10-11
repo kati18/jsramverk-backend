@@ -1,0 +1,25 @@
+{
+  "name": "me-api",
+  "version": "1.0.0",
+  "description": "Server me-api",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "production": "NODE_ENV='production' node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kati18/jsramverk-backend.git"
+  },
+  "author": "Katja Tibe",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+    "sqlite3": "^5.0.0"
+  }
+}

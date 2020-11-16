@@ -7,22 +7,24 @@ module.exports = {
     updateReport: updateReport
 };
 
-const sqlite3 = require('sqlite3').verbose();
+// const sqlite3 = require('sqlite3').verbose();
+//
+// let sqliteDB;
+//
+// /**
+// * Main function
+// * @async
+// * @returns void
+// */
+// (async function() {
+//     sqliteDB = await new sqlite3.Database('./db/texts.sqlite');
+//
+//     process.on("exit", () => {
+//         sqliteDB.close();
+//     });
+// })();
 
-let sqliteDB;
-
-/**
-* Main function
-* @async
-* @returns void
-*/
-(async function() {
-    sqliteDB = await new sqlite3.Database('./db/texts.sqlite');
-
-    process.on("exit", () => {
-    sqliteDB.close();
-    });
-})();
+const sqliteDB = require("../db/database.js");
 
 
 //  * Shows specific entries in the reports table.
@@ -30,8 +32,8 @@ let sqliteDB;
 //  * @async
 //  * @returns void
 //  */
-function getReport(res, weekNo, status=200) {
-    return new Promise(function(resolve) {
+function getReport(req, res, weekNo) {
+    return new Promise(function(resolve, reject) {
         let sql = `
                 SELECT
                     *
@@ -43,14 +45,33 @@ function getReport(res, weekNo, status=200) {
         sqliteDB.get(sql, weekNo, function(err, row) { // alt.:
         // sqliteDB.all("SELECT * FROM me", (err, rows) => {
             if (err) {
-                throw err;
+                // return res.status(500).json({
+                //     errors: {
+                //         status: 500,
+                //         source:  "/reports/week/" + weekNo,
+                //         title: "Database error",
+                //         detail: err.message
+                //     }
+                // });
+                // throw err;
+                reject(err.message);
+            } else if (row === undefined) {
+                return res.status(401).json({
+                    errors: {
+                        status: 401,
+                        source: "/reports/week/" + weekNo,
+                        title: "Report not found",
+                        detail: "Report with provided week number not found."
+                    }
+                });
             }
 
             // console.log("row: ", row);
             // console.log("row.report_text: ", row.report_text);
-            res.status(status).json(row);//alt:
+            // res.status(status).json(row);//alt:
             // res.status(status).json( { data: row } );//alt:
             // res.json( { data: rows } );
+            resolve(row);
         });
     });
 }
@@ -60,8 +81,8 @@ function getReport(res, weekNo, status=200) {
 //  * @async
 //  * @returns void
 //  */
-function getReports(res, req, status=200) {
-    return new Promise(function(resolve) {
+function getReports(res) {
+    return new Promise(function(resolve, reject) {
         let sql = `
                 SELECT
                     *
@@ -72,12 +93,33 @@ function getReports(res, req, status=200) {
         sqliteDB.all(sql, function(err, rows) { // alt.:
         // sqliteDB.all("SELECT * FROM me", (err, rows) => {
             if (err) {
-                throw err;
+                // return res.status(500).json({
+                // res.status(500).json({
+                //     errors: {
+                //         status: 500,
+                //         source:  "/reports",
+                //         title: "Database error",
+                //         detail: err.message
+                //     }
+                // });
+                // throw err;
+                reject(err.message);
+            } else if (rows.length == 0) {
+                return res.status(401).json({
+                    errors: {
+                        status: 401,
+                        source: "/reports",
+                        title: "Reports not found",
+                        detail: "Reports not found."
+                    }
+                });
             }
 
             // console.log("rows: ", rows);
             // res.status(status).json( { data: row } );//alt:
-            res.json( { data: rows } );
+            // res.stauts(status).json( { data: rows } );
+
+            resolve(rows);
         });
     });
 }
@@ -88,8 +130,9 @@ function getReports(res, req, status=200) {
 //  * @async
 //  * @returns void
 //  */
-function updateReport(res, body, status=204) {
+function updateReport(res, body) {
     return new Promise(function(resolve, reject) {
+        let kmomNumber = ["1", "2", "3", "4", "5", "6", "10"];
         let data = [body.reportText, body.kmom];
 
         let sql = `
@@ -98,29 +141,38 @@ function updateReport(res, body, status=204) {
                 WHERE week_no = ?`;
 
         sqliteDB.run(sql, data, function(err) {
+            // console.log("data[1] ", data[1]);
             if (err) {
-                return res.status(500).json({
-                    errors: {
-                        status: 500,
-                        source: body.path,
-                        title: "The report couldn´t be updated.",
-                        detail: err
-                    }
-                })
+                // return res.status(500).json({
+                //     errors: {
+                //         status: 500,
+                //         source: "/reports",
+                //         title: "Database error",
+                //         detail: err.message
+                //     }
+                // });
                 reject(err.message);
                 // throw err;
+            } else if (!(kmomNumber.includes(data[1]))) {
+                res.status(401).json({
+                    errors: {
+                        status: 401,
+                        source: "/reports/week/" + data[1],
+                        title: "Report not found",
+                        detail: "Report with provided week number not found."
+                    }
+                });
             } else {
-                // console.log(`Row updated: ${this.changes}`);
+                // let message = "Report successfully added/updated!";
 
-                let message = "Report successfully uppdated!";
-                // console.log("inget från route-filen: ", message);
-                return res.status(204).json({ data: message});
+                // // console.log("inget från route-filen: ", message);
+                // res.status(status).json({ data: message});
 
                 resolve(true);
             }
 
             // console.log(`Row updated: ${this.changes}`);
-        })
+        });
         // console.log("body.kmom från src-filen: ", body.kmom);
         // console.log("body.report_text från src-filen: ", body.reportText);
         // console.log("Inifrån updateReport i src-fil");

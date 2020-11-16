@@ -19,22 +19,24 @@ try {
 const jwtSecret = config.jwtSecret;
 // const jwtSecret = process.env.JWT_SECRET || config.jwtSecret;
 
-const sqlite3 = require('sqlite3').verbose();
+// const sqlite3 = require('sqlite3').verbose();
+//
+// let sqliteDB;
+//
+// /**
+// * Main function
+// * @async
+// * @returns void
+// */
+// (async function() {
+//     sqliteDB = await new sqlite3.Database('./db/texts.sqlite');
+//
+//     process.on("exit", () => {
+//         sqliteDB.close();
+//     });
+// })();
 
-let sqliteDB;
-
-/**
-* Main function
-* @async
-* @returns void
-*/
-(async function() {
-    sqliteDB = await new sqlite3.Database('./db/texts.sqlite');
-
-    process.on("exit", () => {
-    sqliteDB.close();
-    });
-})();
+const sqliteDB = require("../db/database.js");
 
 
 
@@ -43,7 +45,8 @@ let sqliteDB;
 //  * @async
 //  * @returns void
 //  */
-function getUser(res, body, status=200) {
+function getUser(res, body) {
+// function getUser(res, body, status=200) {
     return new Promise(function(resolve, reject) {
         let email = body.email;
 
@@ -54,17 +57,18 @@ function getUser(res, body, status=200) {
 
         sqliteDB.get(sql, email, function(err, row) {
             if (err) {
-                return res.status(500).json({
-                    errors: {
-                        status: 500,
-                        source: "/login",
-                        title: "Database error",
-                        detail: err.message
-                    }
-                });
-            }
-
-            if (row === undefined) {
+                // return res.status(500).json({
+                //     errors: {
+                //         status: 500,
+                //         source: "/login",
+                //         title: "Database error",
+                //         detail: err.message
+                //     }
+                // });
+                // console.log("err.message från src/login.js: ", err.mesage);
+                // console.log("err från src/login.js: ", err);
+                reject(err.message);
+            } else if (row === undefined) {
                 return res.status(401).json({
                     errors: {
                         status: 401,
@@ -73,20 +77,16 @@ function getUser(res, body, status=200) {
                         detail: "User with provided email not found."
                     }
                 });
-            }
-
-            const user = row;
-            // console.log("user från src login.js: ", user);
-            resolve(row);
-            // console.log(`Row updated: ${this.changes}`);
+            } else {
+                resolve(row);
+                // console.log(`Row updated: ${this.changes}`);
                 // returns true to src-file:
                 // resolve(true);
                 // returns a statement to src-file:
                 // resolve(this);
-            // }
-
-            // console.log(`Row updated: ${this.changes}`);
-        })
+                // console.log(`Row updated: ${this.changes}`);
+            }
+        });
         // console.log("body.email från src-filen: ", body.email);
         // console.log("hashedPassedWord från src-filen: ", hashedPassedWord);
         // console.log("Inifrån updateReport i src-fil");
@@ -96,10 +96,12 @@ function getUser(res, body, status=200) {
 
 function checkToken(req, res, next) {
     var token = req.headers['authorization'];
-    console.log("token från src-filen login.js: ", token);
+
+    // console.log("token från src-filen login.js: ", token);
 
     if (token) {
-        jwt.verify(token, jwtSecret, function(err, decoded) {
+        // jwt.verify(token, jwtSecret, function(err, decoded) {
+        jwt.verify(token, jwtSecret, function(err) {
             if (err) {
                 return res.status(500).json({
                     errors: {
@@ -118,7 +120,6 @@ function checkToken(req, res, next) {
             next();
 
             return undefined;
-
         });
     } else {
         return res.status(401).json({

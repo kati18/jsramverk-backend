@@ -2,7 +2,7 @@
 -- By kati18 for course jsramverk, webbprogrammering BTH.
 -- 2020-10-11
 
--- Commands for Cygwin terminal to create/restore database to scratch:
+-- Commands for Cygwin terminal to create/restore database from scratch:
 -- cd db
 -- sqlite3 texts.sqlite
 -- .read migrate.sql

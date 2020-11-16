@@ -17,8 +17,30 @@ router.get('/week/:week_no', (req, res) => {
     // console.log(req.params.week_no);
     // console.log(typeof req.params.week_no);// string
 
-    reports.getReport(res, req.params.week_no);
-
+    reports.getReport(req, res, req.params.week_no)
+        .then((result) => {
+            // console.log("result från routes reports.js: ", result);
+            res.status(200).json({
+                data: {
+                    status: 200,
+                    type: "success",
+                    message: "Report found",
+                    data: result
+                }
+            });
+        })
+        .catch((err) => {
+            // console.log("err från routes reports.js: ", err);
+            res.status(500).json({
+                errors: {
+                    status: 500,
+                    source: "/",
+                    title: "Database error",
+                    detail: err
+                }
+            });
+            throw err;
+        });
 });
 
 
@@ -27,7 +49,30 @@ router.get('/week/:week_no', (req, res) => {
  * @param Object res The response
  */
 router.get('/', (req, res) => {
-    reports.getReports(res, req);
+    reports.getReports(res)
+        .then((result) => {
+            // console.log("result från routes reports.js: ", result);
+            res.status(200).json({
+                data: {
+                    status: 200,
+                    type: "success",
+                    message: "Reports found",
+                    data: result
+                }
+            });
+        })
+        .catch((err) => {
+            // console.log("err från routes reports.js: ", err);
+            res.status(500).json({
+                errors: {
+                    status: 500,
+                    source: "/",
+                    title: "Database error",
+                    detail: err
+                }
+            });
+            throw err;
+        });
 });
 
 
@@ -39,27 +84,28 @@ router.get('/', (req, res) => {
 router.post('/',
     (req, res, next) => login.checkToken(req, res, next),
     (req, res) => {
-
         reports.updateReport(res, req.body)
-        .then(() => {
-            let message = "Report successfully uppdated!";
-            // console.log("message: ", message);
-            // res.status(204).json({ data: message});
-        })
-        .catch((err) => {
-
-            // res.status(500).json({
-            //     errors: {
-            //         status: 500,
-            //         source: "/reports",
-            //         title: "The report couldn´t be updated.",
-            //         detail: err
-            //     }
-            // });
-
-            // console.log("error från catch error: ", err);
-            throw err;
-        });
+            .then(() => {
+                res.status(201).json({
+                    data: {
+                        status: 201,
+                        type: "success",
+                        message: "Report successfully added/updated!"
+                    }
+                });
+            })
+            .catch((err) => {
+                res.status(500).json({
+                    errors: {
+                        status: 500,
+                        source: "/reports",
+                        title: "Database error",
+                        detail: err
+                    }
+                });
+                // console.log("error från catch error: ", err);
+                // throw err;
+            });
     }
 );
 

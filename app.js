@@ -2,8 +2,8 @@
 
 "use strict";
 
-const port = 1337;
-const path    = require("path");
+// const port = 1337; // changed to 8333 in app.js on production server
+const port = 8333; // is used on production server
 const express = require("express");
 const cors = require('cors');
 const morgan = require('morgan');
@@ -25,8 +25,8 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 app.use((req, res, next) => {
-    console.log(req.method);
-    console.log(req.path);
+    // console.log(req.method);
+    // console.log(req.path);
     next();
 });
 
@@ -38,7 +38,7 @@ app.use("/login", routeServerLogin);
 
 /**
  * Below code concerns routes and what happens if a
- * route that doesn´t exists geet called, e g
+ * route that doesn´t exists gets called, e g
  * http://localhost:1337/none
  */
 // Add routes for 404 and error handling
@@ -46,6 +46,7 @@ app.use("/login", routeServerLogin);
 // Put this last
 app.use((req, res, next) => {
     var err = new Error("Not Found");
+
     err.status = 404;
     next(err);
 });
@@ -72,5 +73,18 @@ app.use((err, req, res, next) => {
  */
 
 
-// Start up server
-app.listen(port, () => console.log(`Me API listening on port ${port}!`));
+// Start up server:
+// app.listen(port, () => console.log(`Me API listening on port ${port}!`));
+// alt::
+// app.listen(port, () => {
+//     console.log(`Me API listening on port ${port}!`);
+// });
+
+// Below for being able to export server for testing purposes:
+const server = app.listen(port, () => console.log(`Me API listening on port ${port}!`));
+// alt.:
+// const server = app.listen(port, () => {
+//     console.log(`Me API listening on port ${port}!`);
+// });
+
+module.exports = server;

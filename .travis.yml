@@ -13,7 +13,7 @@ git:
 
 matrix:
     allow_failures:
-        - node_js: "6"
+        - node_js: "8"
 
 before_script:
     - npm install

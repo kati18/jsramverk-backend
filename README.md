@@ -1,5 +1,11 @@
 # Me API
 
+[![Build Status](https://travis-ci.org/kati18/jsramverk-backend.svg?branch=master)](https://travis-ci.org/kati18/jsramverk-backend)
+
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/kati18/jsramverk-backend/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/kati18/jsramverk-backend/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/kati18/jsramverk-backend/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/kati18/jsramverk-backend/?branch=master)
+[![Build Status](https://scrutinizer-ci.com/g/kati18/jsramverk-backend/badges/build.png?b=master)](https://scrutinizer-ci.com/g/kati18/jsramverk-backend/build-status/master)
+
 ## The project
 
 This project, backend RESTful API and SQLite database for fetching and storing data, is released as an assignment and a part of a University course [DV1612 JavaScript-baserade webbramverk](https://jsramverk.se/) at BTH(Blekinge Institute of Technology) 2020.
